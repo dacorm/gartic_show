@@ -11,9 +11,10 @@ export type PaintCoords = {
 type CanvasProps = {
     onPaint: (data: PaintCoords) => void;
     onInit: (ref: CanvasRenderingContext2D) => void;
+    onClear: () => void;
 }
 
-const Canvas: React.FC<CanvasProps> = ({ onPaint, onInit }) => {
+const Canvas: React.FC<CanvasProps> = ({onPaint, onInit, onClear}) => {
     const rootRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -49,7 +50,10 @@ const Canvas: React.FC<CanvasProps> = ({ onPaint, onInit }) => {
     }, [])
 
     return (
-        <canvas ref={rootRef} className={styles.root}/>
+        <>
+            <canvas ref={rootRef} className={styles.root}/>
+            <button onClick={onClear}>Clear</button>
+        </>
     );
 };
 

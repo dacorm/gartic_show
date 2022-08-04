@@ -10,22 +10,36 @@ const Home: NextPage = () => {
     const canvasCtxRef = useRef<CanvasRenderingContext2D>();
 
     useEffect(() => {
-        socketRef.current = io('http://localhost:4000');
+        if (typeof window !== 'undefined') {
+            socketRef.current = io('http://localhost:4000');
 
-        socketRef.current.on('repaint', ({ x, y, dx, dy }) => {
-            if (canvasCtxRef.current) {
-                canvasCtxRef.current.beginPath();
-                canvasCtxRef.current.moveTo(x, y);
-                canvasCtxRef.current.lineTo(x - dx, y - dy);
-                canvasCtxRef.current.stroke();
-                canvasCtxRef.current.closePath();
-            }
-        })
+            socketRef.current?.on('clear_canvas', () => {
+                if (canvasCtxRef.current) {
+                    canvasCtxRef.current?.clearRect(0, 0, 1000, 600);
+                }
+            })
+
+            socketRef.current.on('repaint', ({ x, y, dx, dy }) => {
+                if (canvasCtxRef.current) {
+                    canvasCtxRef.current.beginPath
+                    canvasCtxRef.current.moveTo(x, y);
+                    canvasCtxRef.current.lineTo(x - dx, y - dy);
+                    canvasCtxRef.current.stroke();
+                    canvasCtxRef.current.closePath();
+                }
+            })
+        }
     }, [])
 
     const onPaint = (data: PaintCoords) => {
         if (socketRef.current) {
             socketRef.current.emit('paint', data);
+        }
+    }
+
+    const onClear = () => {
+        if (socketRef.current) {
+            socketRef.current.emit('clear');
         }
     }
 
@@ -53,7 +67,7 @@ const Home: NextPage = () => {
                 </div>
 
                 <div className={styles.canvas}>
-                    <Canvas onPaint={onPaint} onInit={canvasCtx => canvasCtxRef.current = canvasCtx} />
+                    <Canvas onClear={onClear} onPaint={onPaint} onInit={canvasCtx => canvasCtxRef.current = canvasCtx} />
                 </div>
             </div>
         </div>
